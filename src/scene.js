@@ -84,10 +84,10 @@ export class SceneSetup {
    * @param {string} modelUrl
    * @param {{albedo:string, normal:string, roughness:string}} texUrls
    */
-  loadModel(modelUrl, texUrls) {
+  loadModel(modelUrl, cardUrl, texUrls) {
     // воспользуемся тем же CardBox
     this.card = new CardBox(this.scene, this.gui);
-    this.card.load(modelUrl, texUrls, group => {
+    this.card.load(modelUrl,cardUrl, texUrls, group => {
       // колбэк пользователя из main.js
       if (this.onResourcesLoaded) {
         this.onResourcesLoaded(group);

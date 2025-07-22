@@ -15,11 +15,20 @@ export class CardBox {
     this.group = new THREE.Group();
     this.scene.add(this.group);
 
+    // Объект дял храниния модели упаковки
+    this.boxModel = null
+
+    // Объект для хранения модели карты
+    this.cardModel = null
+
+    // Объект для хранения карт
+     this.cards = {};
+
     // Мапа для хранения загруженных текстур
     this.loadedTextures = {};
 
     // Флаг, что модель добавлена в сцену
-    this.modelLoaded = false;
+    //this.modelLoaded = false;
 
     // Параметры позиции модели
     this.params = { x: 0, y: 0, z: 0 };
@@ -46,7 +55,7 @@ export class CardBox {
    * @param {{ albedo:string, normal:string, roughness:string }} texUrls
    * @param {Function} onLoad
    */
-  load(modelUrl, texUrls, onLoad) {
+  load(boxmodelUrl, cardmodelUrl, texUrls, onLoad) {
     // загрузчик, который ждёт и модель, и все текстуры
     const manager = new THREE.LoadingManager();
     manager.onLoad = () => {
@@ -58,11 +67,24 @@ export class CardBox {
       if (onLoad) onLoad(this.group);
     };
 
-    // 1) загрузка GLB
-    new GLTFLoader(manager).load(modelUrl, gltf => {
+
+
+   const gltfLoader = new GLTFLoader(manager);
+
+    // 1) Загрузка первой модели (коробки)
+    gltfLoader.load(boxmodelUrl, gltf => {
+      this.box = gltf; 
       this.group.add(gltf.scene);
-      this.modelLoaded = true;
     });
+
+    // 2) Загрузка второй модели (карты)
+    if (cardmodelUrl != null) {
+        gltfLoader.load(cardmodelUrl, gltf => {
+        this.card = gltf; 
+        this.group.add(gltf.scene);
+    }); 
+    }
+   
 
     // 2) загрузка текстур с отключением flipY
     const texLoader = new THREE.TextureLoader(manager);
@@ -76,6 +98,14 @@ export class CardBox {
         this.loadedTextures[type] = texture;
       });
     });
+  }
+
+  /**
+   * Устанавливает в сцену карты
+   * @param {*} count // Количество отображаемых карт
+   */
+  setCards(count, cardTextures) {
+
   }
 
   /**
