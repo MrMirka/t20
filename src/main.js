@@ -18,7 +18,7 @@ import { SceneSetup } from './scene.js';
   // 3) грузим модель + текстуры
   app.loadModel(
     '/model/model.glb',
-   null,
+   '/textures/hand.png',
     {
       albedo:   '/model/albedo.jpg',
       normal:   '/model/normals.jpg',

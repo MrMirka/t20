@@ -86,7 +86,7 @@ export class SceneSetup {
    */
   loadModel(modelUrl, cardUrl, texUrls) {
     // воспользуемся тем же CardBox
-    this.card = new CardBox(this.scene, this.gui);
+    this.card = new CardBox(this.scene, this.gui, this.canvas);
     this.card.load(modelUrl,cardUrl, texUrls, group => {
       // колбэк пользователя из main.js
       if (this.onResourcesLoaded) {
