@@ -15,16 +15,17 @@ import { SceneSetup } from './scene.js';
     // здесь можно, например, начать анимацию или выполнить другие init-колбэки
   };
 
+    app.loadEnvironment('/light/GSG_ProStudiosMetal_Vol2_24_Env_sm.exr', () => {
+    console.log('🗺️ Карта окружения загружена!');
+  }); 
+
   // 3) грузим модель + текстуры
   app.loadModel(
     '/model/model.glb',
-   '/textures/hand.png',
-    {
-      albedo:   '/model/albedo.jpg',
-      normal:   '/model/normals.jpg',
-      roughness:'/model/roughness.jpg',
-    }
+   'pack1'
   );
+
+
 
   // 4) старт рендер-цикла
   app.render(() => {
