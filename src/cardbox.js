@@ -23,8 +23,11 @@ export class CardBox {
     // Объект для храниния модели упаковки
     this.boxModel = null
 
-    // Объект для хранения модели карты
-    this.cardModel = null
+    // Микшер для управления анимацией
+    this.mixer = null;
+
+    // Сюда надо сохранить анимацию
+    this.animation = null
 
     // Объект для хранения модели руки
     this.handModel = null
@@ -85,6 +88,18 @@ export class CardBox {
     gltfLoader.load(boxmodelUrl, gltf => {
       this.box = gltf; 
       this.group.add(gltf.scene);
+
+      
+      this.mixer = new THREE.AnimationMixer(gltf.scene);
+      const clip =  gltf.animations[0];
+      
+      if (clip) {
+        this.animation = this.mixer.clipAction(clip);
+        this.animation.setLoop(THREE.LoopOnce);
+        this.animation.clampWhenFinished = true;
+      } else {
+        console.warn('Animation with name "amin1" not found in the model!');
+      }
     });
 
 
@@ -100,6 +115,30 @@ export class CardBox {
         this.loadedTextures[type] = texture;
       });
     });
+  }
+
+   play() {
+    if (this.animation) {
+      this.animation.reset().play();
+    } else {
+      console.error("Animation is not loaded or does not exist.");
+    }
+  }
+
+  stop() {
+    if (this.animation) {
+      this.animation.stop();
+    }
+  }
+
+  /**
+   * Обновляем кадры анимауии
+   * @param {number} deltaTime 
+   */
+  update(deltaTime) {
+    if (this.mixer) {
+      this.mixer.update(deltaTime);
+    }
   }
 
 

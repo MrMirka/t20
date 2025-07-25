@@ -6,16 +6,17 @@ import { SceneSetup } from './scene.js';
   const app    = new SceneSetup(canvas);
 
   // 1) настраиваем камеру и свет
-  app.initCamera({ position: [0, 0, 0.36] });
+  app.initCamera({ position: [0, 0, 0.23] });
   app.initLights();
 
   // 2) подписываемся на готовность модели
   app.onResourcesLoaded = group => {
     console.log('😊 Всё загрузилось, группа модели:', group);
-    // здесь можно, например, начать анимацию или выполнить другие init-колбэки
+    document.getElementById('playBtn').onclick = () => app.card.play();
+
   };
 
-    app.loadEnvironment('/light/GSG_ProStudiosMetal_Vol2_24_Env_sm.exr', () => {
+    app.loadEnvironment('/light/GSG_ProStudiosMetal_Vol2_23_Env_sm.exr', () => {
     console.log('🗺️ Карта окружения загружена!');
   }); 
 
