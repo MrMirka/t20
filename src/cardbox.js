@@ -27,7 +27,8 @@ export class CardBox {
     this.mixer = null;
 
     // Сюда надо сохранить анимацию
-    this.animation = null
+    this.animation_1 = null
+    this.animation_2 = null
 
     // Объект для хранения модели руки
     this.handModel = null
@@ -92,11 +93,19 @@ export class CardBox {
       
       this.mixer = new THREE.AnimationMixer(gltf.scene);
       const clip =  gltf.animations[0];
+      const clip_2 =  gltf.animations[1];
       
       if (clip) {
-        this.animation = this.mixer.clipAction(clip);
-        this.animation.setLoop(THREE.LoopOnce);
-        this.animation.clampWhenFinished = true;
+        this.animation_1 = this.mixer.clipAction(clip);
+        this.animation_1.setLoop(THREE.LoopOnce);
+        this.animation_1.clampWhenFinished = true;
+      } else {
+        console.warn('Animation with name "amin1" not found in the model!');
+      }
+      if (clip_2) {
+        this.animation_2 = this.mixer.clipAction(clip_2);
+        this.animation_2.setLoop(THREE.LoopOnce);
+        this.animation_2.clampWhenFinished = true;
       } else {
         console.warn('Animation with name "amin1" not found in the model!');
       }
@@ -107,6 +116,17 @@ export class CardBox {
     const texLoader = new THREE.TextureLoader(manager);
     Object.entries(texUrls).forEach(([type, url]) => {
       texLoader.load(url, texture => {
+        switch (type) {
+            case 'albedo':
+              texture.colorSpace = THREE.SRGBColorSpace;
+              break;
+            case 'normal':
+              texture.colorSpace = THREE.NoColorSpace;
+              break;
+            case 'roughness':
+              texture.colorSpace = THREE.NoColorSpace;
+              break;
+        }
         texture.flipY = false;     
         texture.wrapS      = THREE.RepeatWrapping;       
         texture.wrapT      = THREE.RepeatWrapping;        
@@ -118,16 +138,17 @@ export class CardBox {
   }
 
    play() {
-    if (this.animation) {
-      this.animation.reset().play();
+    if (this.animation_1 && this.animation_2) {
+      this.animation_1.reset().play();
+      this.animation_2.reset().play();
     } else {
       console.error("Animation is not loaded or does not exist.");
     }
   }
 
   stop() {
-    if (this.animation) {
-      this.animation.stop();
+    if (this.animation_1) {
+      this.animation_1.stop();
     }
   }
 
@@ -157,14 +178,14 @@ export class CardBox {
         case 'albedo':
           texture.colorSpace = THREE.SRGBColorSpace;
           obj.material.map = texture;
-          obj.material.metalness = 0.7;
-          obj.material.roughness = 0.45;
+          obj.material.metalness = 1;
           break;
         case 'normal':
           obj.material.normalMap = texture;
           break;
         case 'roughness':
-         //obj.material.roughnessMap = texture;
+          // Правка
+         obj.material.roughnessMap = texture;
           break;
       }
       obj.material.needsUpdate = true;

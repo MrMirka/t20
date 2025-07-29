@@ -8,24 +8,24 @@ const RESOLUTION = window.devicePixelRatio || 1;
 
 const packTextures = {
   'pack1': {
-    albedo: '/textures/pack1/Package_01_Card_2048x2048px_Albedo_01.png',
-    normal: '/textures/pack1/Package_01_Card_2048x2048px_Normal_01.png',
-    roughness: '/textures/pack1/Package_01_Card_2048x2048px_Roughness_01.png',
+    albedo: 'textures/pack1/Package_01_Card_2048x2048px_Albedo_01.png',
+    normal: 'textures/pack1/Package_01_Card_2048x2048px_Normal_01.png',
+    roughness: 'textures/pack1/Package_01_Card_2048x2048px_Roughness_01.png',
   },
   'pack3': {
-    albedo: '/textures/pack3/Package_03_Cards_2048x2048px_Albedo_01.png',
-    normal: '/textures/pack3/Package_03_Cards_2048x2048px_Normal_01.png',
-    roughness: '/textures/pack3/Package_03_Cards_2048x2048px_Roughness_01.png',
+    albedo: 'textures/pack3/Package_03_Cards_2048x2048px_Albedo_01.png',
+    normal: 'textures/pack3/Package_03_Cards_2048x2048px_Normal_01.png',
+    roughness: 'textures/pack3/Package_03_Cards_2048x2048px_Roughness_01.png',
   },
   'pack20': {
-    albedo: '/textures/pack20/Package_20_Cards_2048x2048px_Albedo_01.png',
-    normal: '/textures/pack20/Package_20_Cards_2048x2048px_Normal_01.png',
-    roughness: '/textures/pack20/Package_20_Cards_2048x2048px_Roughness_01.png',
+    albedo: 'textures/pack20/Package_20_Cards_2048x2048px_Albedo_01.png',
+    normal: 'textures/pack20/Package_20_Cards_2048x2048px_Normal_01.png',
+    roughness: 'textures/pack20/Package_20_Cards_2048x2048px_Roughness_01.png',
   },
   'pack80': {
-    albedo: '/textures/pack80/Package_80_Cards_2048x2048px_Albedo_01.png',
-    normal: '/textures/pack80/Package_80_Cards_2048x2048px_Normal_01.png',
-    roughness: '/textures/pack80/Package_80_Cards_2048x2048px_Roughness_01.png',
+    albedo: 'textures/pack80/Package_80_Cards_2048x2048px_Albedo_01.png',
+    normal: 'textures/pack80/Package_80_Cards_2048x2048px_Normal_01.png',
+    roughness: 'textures/pack80/Package_80_Cards_2048x2048px_Roughness_01.png',
   }
 };
 
@@ -41,6 +41,7 @@ export class SceneSetup {
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.physicallyCorrectLights = true;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    //this.renderer.toneMapping = THREE.SRGBColorSpace;
     this.renderer.toneMappingExposure = 1.5;
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -79,7 +80,7 @@ export class SceneSetup {
     this.directionalLight.position.set(5, 5, 5);
     this.scene.add(this.directionalLight);
 
-    this.ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    this.ambientLight = new THREE.PointLight(0xffffff, 0.5);
     this.scene.add(this.ambientLight);
   }
 
@@ -88,6 +89,7 @@ export class SceneSetup {
     const exrLoader = new EXRLoader();
     exrLoader.load(url, (texture) => {
       texture.mapping = THREE.EquirectangularReflectionMapping;
+      texture.colorSpace = THREE.LinearSRGBColorSpace;
       this.scene.environment = texture;
       this.scene.environmentIntensity = this.params.environmentIntensity;
 
@@ -122,7 +124,7 @@ export class SceneSetup {
       this._addLightUI('DirectionalLight', this.directionalLight);
     }
     if (this.ambientLight) {
-      this._addLightUI('AmbientLight', this.ambientLight);
+      this._addLightUI('PointLight', this.ambientLight);
     }
 
     const boxTextures = packTextures[packName];
@@ -138,7 +140,7 @@ export class SceneSetup {
 
   render(update) {
     gsap.ticker.add(() => {
-      const deltaTime = this.clock.getDelta() * 2;
+      const deltaTime = this.clock.getDelta() * 1.2;
       if (this.card) {
         this.card.update(deltaTime);
       }
