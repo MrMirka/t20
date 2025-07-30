@@ -29,19 +29,48 @@ const packTextures = {
   }
 };
 
+const SceneConfig = {
+  showGUI: true,
+  packName: 'pack1',
+  environment: {
+    intensity: 3.0,
+    rotation: { x: 0, y: 0.4, z: 0 },
+  },
+  camera: {
+    position: { x: 0, y: 0, z: 0.2 },
+  },
+  directionalLight: {
+    color: '#ffffff',
+    intensity: 0.1,
+    position: { x: 1.5, y: -1.1, z: 4.1 },
+  },
+  pointLight: {
+    color: '#ffffff',
+    intensity: 0.1,
+    position: { x: 0.2, y: 0.2, z: 0.2 },
+  }
+};
+
+
+
+
 export class SceneSetup {
-  constructor(canvas) {
+  constructor(canvas, isMobile) {
     this.canvas = canvas;
+    this.config = JSON.parse(JSON.stringify(SceneConfig));
+    // Устанавливаем начальное значение isMobile из аргумента конструктора
+    this.isMobile = isMobile;
     this.scene = new THREE.Scene();
 
     this.clock = new THREE.Clock();
+
+     this.config = JSON.parse(JSON.stringify(SceneConfig));
 
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.physicallyCorrectLights = true;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    //this.renderer.toneMapping = THREE.SRGBColorSpace;
     this.renderer.toneMappingExposure = 1.5;
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -52,12 +81,13 @@ export class SceneSetup {
     this.gui = null;
     this.camera = null;
     this.directionalLight = null;
-    this.ambientLight = null;
+    this.pointLight = null;
+   
 
     this.params = {
       showGUI: true,
       packName: null,
-      environmentIntensity: 1.0,
+      environmentIntensity: 3.0,
     };
 
     window.addEventListener('resize', () => this._onResize());
@@ -75,13 +105,16 @@ export class SceneSetup {
     this.camera.position.set(x, y, z);
   }
 
-  initLights() {
-    this.directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    this.directionalLight.position.set(5, 5, 5);
+   initLights() {
+    const dirConfig = this.config.directionalLight;
+    this.directionalLight = new THREE.DirectionalLight(dirConfig.color, dirConfig.intensity);
+    this.directionalLight.position.set(dirConfig.position.x, dirConfig.position.y, dirConfig.position.z);
     this.scene.add(this.directionalLight);
 
-    this.ambientLight = new THREE.PointLight(0xffffff, 0.5);
-    this.scene.add(this.ambientLight);
+    const pointConfig = this.config.pointLight;
+    this.pointLight = new THREE.PointLight(pointConfig.color, pointConfig.intensity);
+    this.pointLight.position.set(pointConfig.position.x, pointConfig.position.y, pointConfig.position.z);
+    this.scene.add(this.pointLight);
   }
 
   loadEnvironment(url, onLoaded) {
@@ -91,7 +124,12 @@ export class SceneSetup {
       texture.mapping = THREE.EquirectangularReflectionMapping;
       texture.colorSpace = THREE.LinearSRGBColorSpace;
       this.scene.environment = texture;
-      this.scene.environmentIntensity = this.params.environmentIntensity;
+       this.scene.environmentIntensity = this.config.environment.intensity;
+      this.scene.environmentRotation.set(
+        this.config.environment.rotation.x,
+        this.config.environment.rotation.y,
+        this.config.environment.rotation.z
+      );
 
       if (onLoaded) onLoaded();
     });
@@ -121,10 +159,10 @@ export class SceneSetup {
 
     
     if (this.directionalLight) {
-      this._addLightUI('DirectionalLight', this.directionalLight);
+      this._addLightUI('DirectionalLight',  this.directionalLight, this.config.directionalLight);
     }
-    if (this.ambientLight) {
-      this._addLightUI('PointLight', this.ambientLight);
+    if (this.pointLight) {
+      this._addLightUI('PointLight', this.pointLight, this.config.pointLight);
     }
 
     const boxTextures = packTextures[packName];
@@ -175,23 +213,20 @@ export class SceneSetup {
 
   _addEnvironmentUI() {
     const f = this.gui.addFolder('Environment');
-    f.add(this.params, 'environmentIntensity', 0, 4, 0.1)
+    const envConfig = this.config.environment;
+
+    f.add(envConfig, 'intensity', 0, 4, 0.1)
       .name('Intensity')
       .onChange(value => {
-        if (this.scene.environment) {
-          this.scene.environmentIntensity = value;
-        }
+        if (this.scene.environment) this.scene.environmentIntensity = value;
       });
 
-    // Привязываем контроллеры напрямую к scene.environmentRotation
-    f.add(this.scene.environmentRotation, 'x', 0, Math.PI * 2, 0.01)
-      .name('Rotation X');
-
-    f.add(this.scene.environmentRotation, 'y', 0, Math.PI * 2, 0.01)
-      .name('Rotation Y');
-
-    f.add(this.scene.environmentRotation, 'z', 0, Math.PI * 2, 0.01)
-      .name('Rotation Z');
+    f.add(envConfig.rotation, 'x', 0, Math.PI * 2, 0.01).name('Rotation X')
+      .onChange(v => this.scene.environmentRotation.x = v);
+    f.add(envConfig.rotation, 'y', 0, Math.PI * 2, 0.01).name('Rotation Y')
+      .onChange(v => this.scene.environmentRotation.y = v);
+    f.add(envConfig.rotation, 'z', 0, Math.PI * 2, 0.01).name('Rotation Z')
+      .onChange(v => this.scene.environmentRotation.z = v);
 
     f.open();
   }
@@ -204,20 +239,22 @@ export class SceneSetup {
     camF.open();
   }
 
-  _addLightUI(name, light) {
+
+
+    _addLightUI(name, light, lightConfig) {
     const f = this.gui.addFolder(name);
-    if (light.color) {
-      const p = { color: `#${light.color.getHexString()}` };
-      f.addColor(p, 'color').name('color').onChange(c => light.color.set(c));
-    }
-    if ('intensity' in light) {
-      f.add(light, 'intensity', 0, 10, 0.01).name('intensity');
-    }
-    if (light.position) {
-      ['x', 'y', 'z'].forEach(axis => {
-        f.add(light.position, axis, -10, 10, 0.1).name(axis);
-      });
-    }
+    console.log(lightConfig)
+    f.addColor(lightConfig, 'color').name('Color')
+      .onChange(c => light.color.set(c));
+
+    f.add(lightConfig, 'intensity', 0, 10, 0.01).name('Intensity')
+      .onChange(v => light.intensity = v);
+
+    const posConfig = lightConfig.position;
+    f.add(posConfig, 'x', -20, 20, 0.1).name('pos x').onChange(v => light.position.x = v);
+    f.add(posConfig, 'y', -20, 20, 0.1).name('pos y').onChange(v => light.position.y = v);
+    f.add(posConfig, 'z', -20, 20, 0.1).name('pos z').onChange(v => light.position.z = v);
+
     f.open();
   }
 
