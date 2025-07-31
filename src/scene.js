@@ -58,7 +58,6 @@ export class SceneSetup {
   constructor(canvas, isMobile) {
     this.canvas = canvas;
     this.config = JSON.parse(JSON.stringify(SceneConfig));
-    // Устанавливаем начальное значение isMobile из аргумента конструктора
     this.isMobile = isMobile;
     this.scene = new THREE.Scene();
 
@@ -66,7 +65,7 @@ export class SceneSetup {
 
      this.config = JSON.parse(JSON.stringify(SceneConfig));
 
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.physicallyCorrectLights = true;

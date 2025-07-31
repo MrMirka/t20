@@ -26,7 +26,7 @@ export class CardBox {
     // Микшер для управления анимацией
     this.mixer = null;
 
-    // Сюда надо сохранить анимацию
+    // Анимации
     this.animation_1 = null
     this.animation_2 = null
 
@@ -69,15 +69,11 @@ export class CardBox {
    * @param {Function} onLoad
    */
   load(boxmodelUrl, texUrls, onLoad) {
-    // загрузчик, который ждёт и модель, и все текстуры
     const manager = new THREE.LoadingManager();
     manager.onLoad = () => {
-      // сначала применяем все текстуры
       Object.entries(this.loadedTextures).forEach(([type, texture]) => {
-
         this._applyTexture(type, texture);
       });
-      // затем колбэк пользователя
       if (onLoad) onLoad(this.group);
     };
 
@@ -85,7 +81,6 @@ export class CardBox {
 
    const gltfLoader = new GLTFLoader(manager);
 
-    // 1) Загрузка первой модели (коробки)
     gltfLoader.load(boxmodelUrl, gltf => {
       this.box = gltf; 
       this.group.add(gltf.scene);
@@ -112,7 +107,7 @@ export class CardBox {
     });
 
 
-    // 2) загрузка текстур с отключением flipY
+    // 2) загрузка текстур 
     const texLoader = new THREE.TextureLoader(manager);
     Object.entries(texUrls).forEach(([type, url]) => {
       texLoader.load(url, texture => {
