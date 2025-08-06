@@ -24,7 +24,7 @@ import { UAParser } from 'ua-parser-js';
 
   };
 
-  app.loadEnvironment('light/GSG_ProStudiosMetal_Vol2_23_Env_sm.exr', () => {
+  app.loadEnvironment('light/GSG_ProStudiosMetal_Vol2_23_Env_sm_compress.exr', () => {
     console.log('🗺️ Карта окружения загружена!');
   });
 

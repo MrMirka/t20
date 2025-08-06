@@ -8,24 +8,24 @@ const RESOLUTION = window.devicePixelRatio || 1;
 
 const packTextures = {
   'pack1': {
-    albedo: 'textures/pack1/Package_01_Card_2048x2048px_Albedo_01.png',
+    albedo: 'textures/pack1/Package_01_Card_2048x2048px_Albedo_01.jpg',
     normal: 'textures/pack1/Package_01_Card_2048x2048px_Normal_01.png',
-    roughness: 'textures/pack1/Package_01_Card_2048x2048px_Roughness_01.png',
+    roughness: 'textures/pack1/Package_01_Card_2048x2048px_Roughness_01.jpg',
   },
   'pack3': {
-    albedo: 'textures/pack3/Package_03_Cards_2048x2048px_Albedo_01.png',
+    albedo: 'textures/pack3/Package_03_Cards_2048x2048px_Albedo_01.jpg',
     normal: 'textures/pack3/Package_03_Cards_2048x2048px_Normal_01.png',
-    roughness: 'textures/pack3/Package_03_Cards_2048x2048px_Roughness_01.png',
+    roughness: 'textures/pack3/Package_03_Cards_2048x2048px_Roughness_01.jpg',
   },
   'pack20': {
-    albedo: 'textures/pack20/Package_20_Cards_2048x2048px_Albedo_01.png',
+    albedo: 'textures/pack20/Package_20_Cards_2048x2048px_Albedo_01.jpg',
     normal: 'textures/pack20/Package_20_Cards_2048x2048px_Normal_01.png',
-    roughness: 'textures/pack20/Package_20_Cards_2048x2048px_Roughness_01.png',
+    roughness: 'textures/pack20/Package_20_Cards_2048x2048px_Roughness_01.jpg',
   },
   'pack80': {
-    albedo: 'textures/pack80/Package_80_Cards_2048x2048px_Albedo_01.png',
+    albedo: 'textures/pack80/Package_80_Cards_2048x2048px_Albedo_01.jpg',
     normal: 'textures/pack80/Package_80_Cards_2048x2048px_Normal_01.png',
-    roughness: 'textures/pack80/Package_80_Cards_2048x2048px_Roughness_01.png',
+    roughness: 'textures/pack80/Package_80_Cards_2048x2048px_Roughness_01.jpg',
   }
 };
 
@@ -65,7 +65,7 @@ export class SceneSetup {
 
      this.config = JSON.parse(JSON.stringify(SceneConfig));
 
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.physicallyCorrectLights = true;
